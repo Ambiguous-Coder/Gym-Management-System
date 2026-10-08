@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYM MANAGEMENT SYSTEM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <style>
+        /* Print layout for profile */
+        @media print {
+            .sidebar, .header, .toast-container, .overlay, .btn {
+                display: none !important;
+            }
+            .main-content { margin: 0; padding: 0; }
+            .card { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+    {% if session.get('user') %}
+    <aside class="sidebar">
+        <h2 style="color: var(--zinc-900); font-weight: bold; margin-bottom: 24px; font-size: 1.25rem; line-height: 1.4;">GYM MANAGEMENT SYSTEM</h2>
+        <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="{{ url_for('members') }}" class="{% if request.endpoint == 'members' or request.endpoint == 'profile' %}active{% endif %}">Members</a>
+        <a href="{{ url_for('attendance') }}" class="{% if request.endpoint == 'attendance' %}active{% endif %}">Attendance</a>
+        <a href="{{ url_for('workouts') }}" class="{% if request.endpoint == 'workouts' %}active{% endif %}">Workouts</a>
+        <a href="{{ url_for('diets') }}" class="{% if request.endpoint == 'diets' %}active{% endif %}">Diets</a>
+        
+        <div style="margin-top: auto; padding-top: 24px; color: var(--zinc-400); font-size: 0.8rem; text-align: center;">
+            Developed by Team Titans
+        </div>
+    </aside>
+    {% endif %}
+
+    <div class="main-content">
+        {% if session.get('user') %}
+        <header class="header">
+            <div style="border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 6px; color: var(--text-muted); font-size: 0.9rem; cursor: pointer; display: flex; align-items: center;" onclick="document.getElementById('searchOverlay').classList.toggle('active'); document.getElementById('searchInput').focus();">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Press Cmd+K / Ctrl+K to search members
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline hover-emerald" style="padding: 0.5rem 1rem;">Go to Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline hover-emerald" style="padding: 0.5rem 1rem;">Logout</a>
+            </div>
+        </header>
+        {% endif %}
+
+        <main class="container">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="toast {{ category }}">
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Search Overlay -->
+    {% if session.get('user') %}
+    <div class="overlay" id="searchOverlay">
+        <div class="search-modal">
+            <form action="{{ url_for('members') }}" method="GET">
+                <input type="text" name="q" class="search-input" id="searchInput" placeholder="Search members by name, phone, email..." autocomplete="off">
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        // Auto-dismiss toasts
+        document.querySelectorAll('.toast').forEach((toast, index) => {
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000 + (index * 500));
+        });
+
+        // Cmd+K / Ctrl+K Search Overlay
+        const overlay = document.getElementById('searchOverlay');
+        const searchInput = document.getElementById('searchInput');
+        
+        if (overlay) {
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    overlay.classList.toggle('active');
+                    if(overlay.classList.contains('active')) {
+                        searchInput.focus();
+                    }
+                }
+                if (e.key === 'Escape' && overlay.classList.contains('active')) {
+                    overlay.classList.remove('active');
+                }
+            });
+
+            overlay.addEventListener('click', (e) => {
+                if(e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

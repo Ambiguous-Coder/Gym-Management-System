@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2>Diet Plans</h2>
+    <button class="btn btn-primary" onclick="document.getElementById('addDietModal').style.display='flex'">+ New Diet</button>
+</div>
+
+<div class="grid-3">
+    {% for key, item in diet_templates.items() %}
+    {% set meals = item.info %}
+    <div class="card" style="display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <h3 style="color: var(--primary);">{{ key }}</h3>
+            {% if plans %}
+            {# Find the plan id to delete if it's a custom plan #}
+            {% for p in plans %}{% if p.name == key %}
+            <form action="{{ url_for('delete_diet_plan', plan_id=p._id) }}" method="POST" onsubmit="return confirm('Delete this diet plan?')">
+                <button type="submit" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem;">Delete</button>
+            </form>
+            {% endif %}{% endfor %}
+            {% endif %}
+        </div>
+        <div style="background: var(--bg-color); padding: 14px; border-radius: var(--radius-md); border-left: 3px solid var(--success); flex: 1;">
+            <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted);">Daily Meal Plan</h4>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: var(--text-main);">
+                <li style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);"><strong>🌅 Breakfast:</strong> {{ meals.breakfast }}</li>
+                <li style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);"><strong>☀️ Lunch:</strong> {{ meals.lunch }}</li>
+                <li style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);"><strong>🌙 Dinner:</strong> {{ meals.dinner }}</li>
+                <li><strong>🍎 Snacks:</strong> {{ meals.snacks }}</li>
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Add Diet Modal -->
+<div class="overlay" id="addDietModal">
+    <div class="search-modal" style="width: 500px;">
+        <h3 style="margin-bottom: 16px; color: var(--primary);">Add New Diet Plan</h3>
+        <form action="{{ url_for('diets') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Plan Name</label>
+                <input type="text" name="name" class="form-control" required placeholder="e.g. Keto Shred">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Breakfast</label>
+                <input type="text" name="breakfast" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Lunch</label>
+                <input type="text" name="lunch" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Dinner</label>
+                <input type="text" name="dinner" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Snacks</label>
+                <input type="text" name="snacks" class="form-control" required>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('addDietModal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Diet</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

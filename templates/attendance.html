@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2>Attendance Logs</h2>
+    <form action="{{ url_for('mark_attendance') }}" method="POST" style="display: flex; gap: 12px; align-items: center;">
+        <input type="date" name="date" class="form-control" style="width: 160px;" value="{{ current_day_date }}">
+        <select name="member_id" class="form-control" style="width: 250px;" required>
+            <option value="">Select Member to Check-in...</option>
+            {% for m in members %}
+            <option value="{{ m.id }}">{{ m.name }} ({{ m.phone or 'No Phone' }})</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-success">Check-in</button>
+    </form>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: var(--bg-color); border-bottom: 1px solid var(--border-color);">
+            <tr>
+                <th style="padding: 16px; font-weight: 500; color: var(--text-muted);">Date & Time</th>
+                <th style="padding: 16px; font-weight: 500; color: var(--text-muted);">Member Name</th>
+                <th style="padding: 16px; font-weight: 500; color: var(--text-muted);">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in logs %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 16px; font-weight: 500;">{{ a.check_in_time }}</td>
+                <td style="padding: 16px; color: var(--text-main);">{{ a.name }}</td>
+                <td style="padding: 16px;">
+                    <button type="button" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.85rem; color: var(--danger); border-color: var(--danger);" onclick="confirmDelete(this, '{{ a.id }}')">Delete</button>
+                    <!-- Confirmation UI block built into the flow -->
+                    <form action="{{ url_for('delete_attendance', attendance_id=a.id) }}" method="POST" style="display: none; margin-left: 8px;" class="delete-confirm-form">
+                        <span style="font-size: 0.8rem; margin-right: 8px;">Are you sure?</span>
+                        <button type="submit" class="btn" style="background: var(--danger); color: white; border: none; padding: 4px 8px; font-size: 0.8rem; border-radius: 4px;">Confirm</button>
+                        <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 4px;" onclick="cancelDelete(this)">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" style="padding: 24px; text-align: center; color: var(--text-muted);">No attendance logs found.</td>
+            </tr>
+            {% endfor %} 
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function confirmDelete(btn, id) {
+        btn.style.display = 'none';
+        btn.nextElementSibling.style.display = 'inline-flex';
+        btn.nextElementSibling.style.alignItems = 'center';
+    }
+    function cancelDelete(btn) {
+        const form = btn.parentElement;
+        form.style.display = 'none';
+        form.previousElementSibling.style.display = 'inline-block';
+    }
+</script>
+{% endblock %}

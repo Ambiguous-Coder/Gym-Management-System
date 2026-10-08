@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2>Member Management</h2>
+    <button class="btn btn-primary" onclick="document.getElementById('addMemberModal').style.display='flex'">+ Add Member</button>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: var(--bg-color); border-bottom: 1px solid var(--border-color);">
+            <tr>
+                <th style="padding: 16px; font-weight: 500; color: var(--text-muted);">Name</th>
+                <th style="padding: 16px; font-weight: 500; color: var(--text-muted);">Phone</th>
+                <th style="padding: 16px; font-weight: 500; color: var(--text-muted);">Weight</th>
+                <th style="padding: 16px; font-weight: 500; color: var(--text-muted);">Plan</th>
+                <th style="padding: 16px; font-weight: 500; color: var(--text-muted);">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in members %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 16px; font-weight: 500;">{{ m.name }} <br><small style="color: var(--text-muted); font-weight: 400;">{{ m.age }} / {{ m.gender }}</small></td>
+                <td style="padding: 16px; color: var(--text-muted);">{{ m.phone or 'N/A' }}</td>
+                <td style="padding: 16px; color: var(--text-muted);">{{ m.metrics.weight }} kg</td>
+                <td style="padding: 16px;"><span style="background: #e0e7ff; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">{{ m.workout_routine }}</span></td>
+                <td style="padding: 16px;">
+                    <a href="{{ url_for('profile', member_id=m.id) }}" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.85rem;">View Profile</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="padding: 24px; text-align: center; color: var(--text-muted);">No members found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Member Modal -->
+<div class="overlay" id="addMemberModal">
+    <div class="search-modal" style="width: 500px; max-height: 90vh; overflow-y: auto;">
+        <h3 style="margin-bottom: 16px; color: var(--primary);">Add New Member</h3>
+        <form action="{{ url_for('members') }}" method="POST" id="addMemberForm">
+            <div class="form-group">
+                <label class="form-label">Full Name*</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div style="display: flex; gap: 16px;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Phone</label>
+                    <input type="text" name="phone" class="form-control">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control">
+                </div>
+            </div>
+            <div style="display: flex; gap: 16px;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Age*</label>
+                    <input type="number" name="age" class="form-control" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Gender*</label>
+                    <select name="gender" class="form-control" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 16px;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Weight (kg)* <br><small style="color:var(--text-muted)">Auto-assigns plan</small></label>
+                    <input type="number" step="0.1" name="weight" class="form-control" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Height (cm)*</label>
+                    <input type="number" step="0.1" name="height" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Fitness Goal*</label>
+                <select name="fitness_goal" class="form-control" required>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Muscle Gain">Muscle Gain</option>
+                    <option value="Weight Loss">Weight Loss</option>
+                </select>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('addMemberModal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

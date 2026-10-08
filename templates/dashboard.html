@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+        <h2>Dashboard Overview</h2>
+        <p style="color: var(--text-muted);">Real-time metrics and system alerts.</p>
+    </div>
+    <div style="max-width: 400px; text-align: right;">
+        <p style="font-style: italic; color: var(--primary); font-weight: 500; font-size: 1.1rem; line-height: 1.4;">"{{ quote }}"</p>
+    </div>
+</div>
+
+<div class="grid-3" style="margin-bottom: 32px;">
+    <div class="card">
+        <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; font-weight: 500;">Total Members</h3>
+        <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary);">{{ stats.total_members }}</div>
+    </div>
+    <div class="card">
+        <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; font-weight: 500;">Daily Attendance</h3>
+        <div style="font-size: 2.5rem; font-weight: bold; color: var(--success);">{{ stats.daily_attendance }}</div>
+    </div>
+    <div class="card">
+        <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; font-weight: 500;">Health Alerts (BMI > 30)</h3>
+        <div style="font-size: 2.5rem; font-weight: bold; color: var(--danger);">{{ stats.health_alerts }}</div>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+    <h3 style="margin-bottom: 16px;">Quick Actions</h3>
+    <div style="display: flex; gap: 16px;">
+        <a href="{{ url_for('members') }}" class="btn btn-primary">Add New Member</a>
+        <a href="{{ url_for('attendance') }}" class="btn btn-outline">Log Attendance</a>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+    <h3 style="margin-bottom: 16px; color: var(--success);">Nutrition & Diet (Latest Member)</h3>
+    {% if members and members|length > 0 %}
+        {% set m = members[0] %}
+        <p style="color: var(--text-muted); margin-bottom: 16px;">Current diet plan assigned to newly added member: <strong>{{ m.name }}</strong></p>
+        <div class="grid-3">
+            <div style="background: var(--bg-color); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--primary);">
+                <h4 style="margin-bottom: 8px;">Goal & Overview</h4>
+                <p style="font-size: 0.9rem; color: var(--text-muted);"><strong>Goal:</strong> {{ m.fitness_goal }}<br><strong>Weight:</strong> {{ m.metrics.weight }}kg</p>
+            </div>
+            <div style="background: var(--bg-color); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--success); grid-column: span 2;">
+                <h4 style="margin-bottom: 8px;">Meal Plan</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted);"><strong>Breakfast:</strong> {{ m.diet_plan.breakfast }}</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);"><strong>Lunch:</strong> {{ m.diet_plan.lunch }}</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);"><strong>Dinner:</strong> {{ m.diet_plan.dinner }}</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);"><strong>Snacks:</strong> {{ m.diet_plan.snacks }}</p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p style="color: var(--text-muted);">No members currently exist in the system to display a diet plan. Add a new member to see this section populate.</p>
+    {% endif %}
+</div>
+{% endblock %}
